@@ -1,0 +1,47 @@
+name: XChief Telegram Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: windows-2022
+
+    steps:
+      - name: Windows Runner Test
+        shell: powershell
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          Write-Host "=== WINDOWS RUNNER ==="
+          Get-CimInstance Win32_OperatingSystem |
+            Select-Object Caption, OSArchitecture
+
+          Write-Host "=== SEND TELEGRAM ==="
+
+          $text = @"
+🟢 XCHIEF TEST 1 OK
+
+Windows Runner: ONLINE
+OS: Windows Server 2022
+Architecture: x64
+GitHub Actions: OK
+Telegram: TESTING
+Time: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+"@
+
+          $body = @{
+            chat_id = $env:TG_CHAT_ID
+            text    = $text
+          } | ConvertTo-Json
+
+          Invoke-RestMethod `
+            -Uri "https://api.telegram.org/bot$($env:TG_TOKEN)/sendMessage" `
+            -Method Post `
+            -ContentType "application/json" `
+            -Body $body
+
+          Write-Host "=== TELEGRAM SENT ==="
