@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: xchief-mt5-dashboard
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: "pip install -r web_dashboard/requirements.txt"
+    startCommand: "python web_dashboard/public_dashboard.py"
+    healthCheckPath: /health
+    autoDeploy: true
